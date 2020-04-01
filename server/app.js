@@ -6,6 +6,8 @@ const mysql = require('mysql');
 const dbConfig = require("./database/database");
 const Message = require("./models/messages");
 const messageData = new Message();
+const Quotes = require("./models/quotes");
+const quoteData = new Quotes();
 
 const dbConn = mysql.createPool(dbConfig);
 const app = express();
@@ -18,6 +20,9 @@ app.use((req, res, next) => {
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     next();
 });
+
+
+// routes for messages.
 
 app.get("/messages", (req, res) => {
     dbConn.query("SELECT * FROM messages", 
@@ -51,6 +56,25 @@ app.delete("/message/:id", (req, res) => {
             res.status(200).send("Message was deleted.")
         }
     });
+})
+
+// routes for quotes.
+
+app.get("/quotes", (req, res) => {
+    quoteData.getQuotes(res);
+});
+
+app.post("/quotes", (req, res) => {
+    const quote = {
+        quotes_content: req.body.content,
+        quotes_author: req.body.author
+    };
+    quoteData.postQuote(quote, res);
+})
+
+app.delete("/quotes/:id", (req, res) => {
+    const quoteId = req.params.id;
+    quoteData.deleteQuote(quoteId, res);
 })
 
 
